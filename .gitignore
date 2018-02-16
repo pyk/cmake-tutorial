@@ -6,3 +6,5 @@ cmake-tutorial
 cmake_install.cmake
 *.a
 *.o
+
+.DS_Store
