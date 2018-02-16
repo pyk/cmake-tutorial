@@ -168,3 +168,9 @@ Run the test:
 
 Done.
 
+
+### IDE Support
+If you are using `CLion`, the google test will automatically detected.
+
+![CLion](https://s9.postimg.org/ugqkdw6nh/Screen_Shot_2018-02-16_at_21.03.10.png)
+
