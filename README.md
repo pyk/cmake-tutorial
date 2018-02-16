@@ -89,7 +89,7 @@ will do nothing:
     % make build
     make: Nothing to be done for `build'.
 
-this is usefull when working on larger project, we only compile the 
+this is useful when working on larger project, we only compile the 
 object that changes.
 
 
