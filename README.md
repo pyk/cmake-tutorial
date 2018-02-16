@@ -71,17 +71,17 @@ We can automate the step to compile and link above using `Makefile`.
 First we need to create new `Makefile` in the root directory 
 with the following content:
 
+    # Add definition to generate math.o object file
     math.o: src/math.cc src/math.h
         c++ -c src/math.cc -o math.o
 
+    # Add definition to generate cmake-tutorial binary
     cmake-tutorial: math.o
         c++ src/main.cc math.o -o cmake-tutorial
 
-    build: cmake-tutorial
-
 Now we can run:
 
-    make build
+    make cmake-tutorial
 
 to build `cmake-tutorial` binary. If there are no changes in 
 `src/{main,math}.cc` and `src/math.h`, the subsequent command 
