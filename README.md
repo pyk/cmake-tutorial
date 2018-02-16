@@ -1,6 +1,39 @@
 # CMake Tutorial
-This tutorial contains step-by-step how to setup CMake on your
-C++ project.
+This tutorial cover the following:
+
+1. Build the project using simple `c++(1)` and `make(1)`.
+2. Build the project using `cmake(1)`.
+3. Build the project using `cmake(1)` with third party library.
+
+
+In this tutorial we will use the following project structure:
+
+```
+cmake-tutorial/
+├── CMakeLists.txt
+├── README.md
+├── lib
+│   └── googletest
+├── src
+│   ├── main.cc
+│   ├── math.cc
+│   └── math.h
+└── test
+    └── math_test.cc
+```
+
+Directory structure:
+
+- `lib` : Directory for third party library.
+- `src` : Directory for source code.
+- `test` : Directory for test.
+
+`src/main.cc` is our main executable and `src/math.{cc,h}` is an internal 
+library that used by `src/main.cc`.
+
+We will start from the basic on how to build the project using `c++(1)` only
+and a simple `Makefile`. Then we define the build in `CMakeLists.txt` and
+using `cmake(1)` to generate complex `Makefile` for us.
 
 
 ## Install CMake
@@ -49,13 +82,15 @@ Now we can run:
 
     make build
 
-to build `cmake-tutorial` binary. If there are no changes in `src/{main,math}.c` and
-`src/math.h`, the subsequent command will do nothing:
+to build `cmake-tutorial` binary. If there are no changes in 
+`src/{main,math}.cc` and `src/math.h`, the subsequent command 
+will do nothing:
 
     % make build
     make: Nothing to be done for `build'.
 
-this is usefull when working on larger project, we only compile the object that changes.
+this is usefull when working on larger project, we only compile the 
+object that changes.
 
 
 ## Using CMake
@@ -94,6 +129,42 @@ Now we can run `make cmake-tutorial` to build the binary.
     [100%] Built target cmake-tutorial
 
 
+## Using CMake with 3rd-party library
+Suppose that we want to write a unit test for `math::add(a, b)`. We will use a
+[googletest](https://github.com/google/googletest) library to create and run the
+unit test.
 
+Add the following definition to `CMakeLists.txt`:
 
+    # Third-party library
+    add_subdirectory(lib/googletest)
+
+    # Test
+    add_executable(math_test test/math_test.cc)
+    target_link_libraries(math_test gtest)
+    target_link_libraries(math_test math)
+
+Re-generate the build files using the following command:
+
+    cmake .
+
+Build the unit test:
+
+    make math_test
+
+Run the test:
+
+    % ./math_test 
+    [==========] Running 1 test from 1 test case.
+    [----------] Global test environment set-up.
+    [----------] 1 test from MathAddTest
+    [ RUN      ] MathAddTest.PositiveNum
+    [       OK ] MathAddTest.PositiveNum (0 ms)
+    [----------] 1 test from MathAddTest (0 ms total)
+
+    [----------] Global test environment tear-down
+    [==========] 1 test from 1 test case ran. (0 ms total)
+    [  PASSED  ] 1 test.
+
+Done.
 
