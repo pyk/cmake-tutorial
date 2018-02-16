@@ -68,7 +68,8 @@ Or we can do the compile and linking on the separate steps
 
 ## Using Makefile
 We can automate the step to compile and link above using `Makefile`.
-First we need to write a `Makefile` with the following content:
+First we need to create new `Makefile` in the root directory 
+with the following content:
 
     math.o: src/math.cc src/math.h
         c++ -c src/math.cc -o math.o
