@@ -87,8 +87,8 @@ to build `cmake-tutorial` binary. If there are no changes in
 `src/{main,math}.cc` and `src/math.h`, the subsequent command 
 will do nothing:
 
-    % make build
-    make: Nothing to be done for `build'.
+    % make cmake-tutorial
+    make: Nothing to be done for `cmake-tutorial'.
 
 this is useful when working on larger project, we only compile the 
 object that changes.
