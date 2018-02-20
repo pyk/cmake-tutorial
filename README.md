@@ -1,10 +1,10 @@
 # CMake Tutorial
+
 This tutorial cover the following:
 
 1. Build the project using simple `c++(1)` and `make(1)`.
 2. Build the project using `cmake(1)`.
 3. Build the project using `cmake(1)` with third party library.
-
 
 In this tutorial we will use the following project structure:
 
@@ -12,8 +12,6 @@ In this tutorial we will use the following project structure:
 cmake-tutorial/
 ├── CMakeLists.txt
 ├── README.md
-├── lib
-│   └── googletest
 ├── src
 │   ├── main.cc
 │   ├── math.cc
@@ -24,19 +22,17 @@ cmake-tutorial/
 
 Directory structure:
 
-- `lib` : Directory for third party library.
 - `src` : Directory for source code.
 - `test` : Directory for test.
 
-`src/main.cc` is our main executable and `src/math.{cc,h}` is an internal 
-library that used by `src/main.cc`.
+`src/main.cc` is our main executable and `src/math.{cc,h}` is an internal library that used by `src/main.cc`.
 
 We will start from the basic on how to build the project using `c++(1)` only
 and a simple `Makefile`. Then we define the build in `CMakeLists.txt` and
 using `cmake(1)` to generate complex `Makefile` for us.
 
-
 ## Install CMake
+
 First of all, you need to install `cmake`. 
 
 On Ubuntu:
@@ -56,6 +52,7 @@ Make sure the `cmake` is installed correctly:
 
 
 ## Compiling & Linking
+
 We can build this project using the following command: 
 
     c++ src/main.cc src/math.cc -o cmake-tutorial
@@ -63,13 +60,12 @@ We can build this project using the following command:
 Or we can do the compile and linking on the separate steps
 
     c++ -c src/math.cc -o math.o 
-    c++ src/main.cc math.o -o cmake-tutorial 
-
+    c++ src/main.cc math.o -o cmake-tutorial
 
 ## Using Makefile
+
 We can automate the step to compile and link above using `Makefile`.
-First we need to create new `Makefile` in the root directory 
-with the following content:
+First we need to create new `Makefile` in the root directory with the following content:
 
     # Add definition to generate math.o object file
     math.o: src/math.cc src/math.h
@@ -83,23 +79,21 @@ Now we can run:
 
     make cmake-tutorial
 
-to build `cmake-tutorial` binary. If there are no changes in 
-`src/{main,math}.cc` and `src/math.h`, the subsequent command 
-will do nothing:
+to build `cmake-tutorial` binary. If there are no changes in `src/{main,math}.cc` and `src/math.h`,
+the subsequent command will do nothing:
 
     % make cmake-tutorial
     make: Nothing to be done for `cmake-tutorial'.
 
-this is useful when working on larger project, we only compile the 
-object that changes.
-
+this is useful when working on larger project, we only compile the object that changes.
 
 ## Using CMake
-Now we know how to perform compiling and linking using the `C++` and
-`make` command. Now we can use `cmake` to do all of this for us.
+
+Now we know how to perform compiling and linking using the `C++` and `make` command.
+Now we can use `cmake` to do all of this for us.
 
 Create new `CMakeLists.txt` with the following content:
-    
+
     cmake_minimum_required (VERSION 3.10)
 
     # Define the project
@@ -112,8 +106,7 @@ Create new `CMakeLists.txt` with the following content:
     add_executable(cmake-tutorial src/main.cc)
     target_link_libraries(cmake-tutorial math)
 
-We can generate the `Makefile` based on the definition above using the following
-command:
+We can generate the `Makefile` based on the definition above using the following command:
 
     cmake .
 
@@ -129,21 +122,40 @@ Now we can run `make cmake-tutorial` to build the binary.
     [100%] Linking CXX executable cmake-tutorial
     [100%] Built target cmake-tutorial
 
-
 ## Using CMake with 3rd-party library
-Suppose that we want to write a unit test for `math::add(a, b)`. We will use a
-[googletest](https://github.com/google/googletest) library to create and run the
-unit test.
+
+Suppose that we want to write a unit test for `math::add(a, b)`.
+We will use a [googletest](https://github.com/google/googletest) library to create and run the unit test.
 
 Add the following definition to `CMakeLists.txt`:
 
     # Third-party library
-    add_subdirectory(lib/googletest)
+    include(ExternalProject)
+    ExternalProject_Add(googletest
+        PREFIX "${CMAKE_BINARY_DIR}/lib"
+        GIT_REPOSITORY "https://github.com/google/googletest.git"
+        GIT_TAG "master"
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/lib/installed
+    )
+    # Prevent build on all targets build
+    set_target_properties(googletest PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
+    # Define ${CMAKE_INSTALL_...} variables
+    include(GNUInstallDirs)
+
+    # Specify where third-party libraries are located
+    link_directories(${CMAKE_BINARY_DIR}/lib/installed/${CMAKE_INSTALL_LIBDIR})
+    include_directories(${CMAKE_BINARY_DIR}/lib/installed/${CMAKE_INSTALL_INCLUDEDIR})
+
+    # This is required for googletest
+    find_package(Threads REQUIRED)
 
     # Test
     add_executable(math_test test/math_test.cc)
-    target_link_libraries(math_test gtest)
-    target_link_libraries(math_test math)
+    target_link_libraries(math_test math gtest Threads::Threads)
+    # Make sure third-party is built before executable
+    add_dependencies(math_test googletest)
+    set_target_properties(math_test PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 Re-generate the build files using the following command:
 
@@ -171,7 +183,7 @@ Done.
 
 
 ### IDE Support
+
 If you are using `CLion`, the google test will automatically detected.
 
 ![CLion](https://s9.postimg.org/ugqkdw6nh/Screen_Shot_2018-02-16_at_21.03.10.png)
-
