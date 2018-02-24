@@ -31,6 +31,7 @@ We will start from the basic on how to build the project using `c++(1)` only
 and a simple `Makefile`. Then we define the build in `CMakeLists.txt` and
 using `cmake(1)` to generate complex `Makefile` for us.
 
+
 ## Install CMake
 
 First of all, you need to install `cmake`. 
@@ -62,6 +63,7 @@ Or we can do the compile and linking on the separate steps
     c++ -c src/math.cc -o math.o 
     c++ src/main.cc math.o -o cmake-tutorial
 
+
 ## Using Makefile
 
 We can automate the step to compile and link above using `Makefile`.
@@ -87,6 +89,7 @@ the subsequent command will do nothing:
 
 this is useful when working on larger project, we only compile the object that changes.
 
+
 ## Using CMake
 
 Now we know how to perform compiling and linking using the `C++` and `make` command.
@@ -110,6 +113,12 @@ We can generate the `Makefile` based on the definition above using the following
 
     cmake .
 
+Or create a `build` directory to store the generated files by CMake:
+
+    mkdir build
+    cd build/
+    cmake ..
+
 Now we can run `make cmake-tutorial` to build the binary.
 
     % make cmake-tutorial
@@ -121,6 +130,11 @@ Now we can run `make cmake-tutorial` to build the binary.
     [ 75%] Building CXX object CMakeFiles/cmake-tutorial.dir/src/main.cc.o
     [100%] Linking CXX executable cmake-tutorial
     [100%] Built target cmake-tutorial
+
+Or we can use the CMake directly via:
+
+    cmake --build . --target cmake-tutorial
+
 
 ## Using CMake with 3rd-party library
 
@@ -159,11 +173,12 @@ Add the following definition to `CMakeLists.txt`:
 
 Re-generate the build files using the following command:
 
-    cmake .
+    cd build/
+    cmake ..
 
 Build the unit test:
 
-    make math_test
+    cmake --build . --target math_test
 
 Run the test:
 
