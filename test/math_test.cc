@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include "../src/math.h"
- 
+
 TEST(MathAddTest, PositiveNum) { 
     EXPECT_EQ(2, math::add(1, 1));
     EXPECT_EQ(10, math::add(2, 8));

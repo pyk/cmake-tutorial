@@ -8,3 +8,6 @@ cmake_install.cmake
 *.o
 
 .DS_Store
+
+/.idea/
+/cmake-build-*/
