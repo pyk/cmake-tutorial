@@ -183,16 +183,32 @@ Build the unit test:
 Run the test:
 
     % ./math_test 
-    [==========] Running 1 test from 1 test case.
+    [==========] Running 6 tests from 3 test cases.
     [----------] Global test environment set-up.
-    [----------] 1 test from MathAddTest
+    [----------] 2 tests from MathAddTest
     [ RUN      ] MathAddTest.PositiveNum
     [       OK ] MathAddTest.PositiveNum (0 ms)
-    [----------] 1 test from MathAddTest (0 ms total)
+    [ RUN      ] MathAddTest.ZeroB
+    [       OK ] MathAddTest.ZeroB (0 ms)
+    [----------] 2 tests from MathAddTest (0 ms total)
+
+    [----------] 2 tests from MathSubTest
+    [ RUN      ] MathSubTest.PositiveNum
+    [       OK ] MathSubTest.PositiveNum (0 ms)
+    [ RUN      ] MathSubTest.ZeroB
+    [       OK ] MathSubTest.ZeroB (0 ms)
+    [----------] 2 tests from MathSubTest (0 ms total)
+
+    [----------] 2 tests from MathMulTest
+    [ RUN      ] MathMulTest.PositiveNum
+    [       OK ] MathMulTest.PositiveNum (0 ms)
+    [ RUN      ] MathMulTest.ZeroB
+    [       OK ] MathMulTest.ZeroB (0 ms)
+    [----------] 2 tests from MathMulTest (0 ms total)
 
     [----------] Global test environment tear-down
-    [==========] 1 test from 1 test case ran. (0 ms total)
-    [  PASSED  ] 1 test.
+    [==========] 6 tests from 3 test cases ran. (0 ms total)
+    [  PASSED  ] 6 tests.
 
 Done.
 
