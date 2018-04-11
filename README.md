@@ -38,57 +38,70 @@ First of all, you need to install `cmake`.
 
 On Ubuntu:
 
-    sudo apt-get install cmake
+```
+sudo apt-get install cmake
+```
 
 On macOS:
 
-    brew install cmake
+```
+brew install cmake
+```
 
 Make sure the `cmake` is installed correctly:
 
-    % cmake --version
-    cmake version 3.10.2
+```
+% cmake --version
+cmake version 3.10.2
 
-    CMake suite maintained and supported by Kitware (kitware.com/cmake).
-
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+```
 
 ## Compiling & Linking
 
 We can build this project using the following command: 
 
-    c++ src/main.cc src/math.cc -o cmake-tutorial
+```
+c++ src/main.cc src/math.cc -o cmake-tutorial
+```
 
 Or we can do the compile and linking on the separate steps
 
-    c++ -c src/math.cc -o math.o 
-    c++ src/main.cc math.o -o cmake-tutorial
-
+```
+c++ -c src/math.cc -o math.o 
+c++ src/main.cc math.o -o cmake-tutorial
+```
 
 ## Using Makefile
 
 We can automate the step to compile and link above using `Makefile`.
 First we need to create new `Makefile` in the root directory with the following content:
 
-    # Add definition to generate math.o object file
-    math.o: src/math.cc src/math.h
-        c++ -c src/math.cc -o math.o
+```makefile
+# Add definition to generate math.o object file
+math.o: src/math.cc src/math.h
+    c++ -c src/math.cc -o math.o
 
-    # Add definition to generate cmake-tutorial binary
-    cmake-tutorial: math.o
-        c++ src/main.cc math.o -o cmake-tutorial
+# Add definition to generate cmake-tutorial binary
+cmake-tutorial: math.o
+    c++ src/main.cc math.o -o cmake-tutorial
+```
 
 Now we can run:
 
-    make cmake-tutorial
+```
+make cmake-tutorial
+```
 
 to build `cmake-tutorial` binary. If there are no changes in `src/{main,math}.cc` and `src/math.h`,
 the subsequent command will do nothing:
 
-    % make cmake-tutorial
-    make: Nothing to be done for `cmake-tutorial'.
+```
+% make cmake-tutorial
+make: Nothing to be done for `cmake-tutorial'.
+```
 
 this is useful when working on larger project, we only compile the object that changes.
-
 
 ## Using CMake
 
@@ -97,44 +110,53 @@ Now we can use `cmake` to do all of this for us.
 
 Create new `CMakeLists.txt` with the following content:
 
-    cmake_minimum_required (VERSION 3.10)
+```cmake
+cmake_minimum_required (VERSION 3.10)
 
-    # Define the project
-    project(cmake-tutorial)
+# Define the project
+project(cmake-tutorial)
 
-    # Add definition for math library
-    add_library(math src/math.cc)
+# Add definition for math library
+add_library(math src/math.cc)
 
-    # Add definition for the cmake-tutorial binary
-    add_executable(cmake-tutorial src/main.cc)
-    target_link_libraries(cmake-tutorial math)
+# Add definition for the cmake-tutorial binary
+add_executable(cmake-tutorial src/main.cc)
+target_link_libraries(cmake-tutorial math)
+```
 
 We can generate the `Makefile` based on the definition above using the following command:
 
-    cmake .
+```
+cmake .
+```
 
 Or create a `build` directory to store the generated files by CMake:
 
-    mkdir build
-    cd build/
-    cmake ..
+```
+mkdir build
+cd build/
+cmake ..
+```
 
 Now we can run `make cmake-tutorial` to build the binary.
 
-    % make cmake-tutorial
-    Scanning dependencies of target math
-    [ 25%] Building CXX object CMakeFiles/math.dir/src/math.cc.o
-    [ 50%] Linking CXX static library libmath.a
-    [ 50%] Built target math
-    Scanning dependencies of target cmake-tutorial
-    [ 75%] Building CXX object CMakeFiles/cmake-tutorial.dir/src/main.cc.o
-    [100%] Linking CXX executable cmake-tutorial
-    [100%] Built target cmake-tutorial
+```
+% make cmake-tutorial
+Scanning dependencies of target math
+[ 25%] Building CXX object CMakeFiles/math.dir/src/math.cc.o
+[ 50%] Linking CXX static library libmath.a
+[ 50%] Built target math
+Scanning dependencies of target cmake-tutorial
+[ 75%] Building CXX object CMakeFiles/cmake-tutorial.dir/src/main.cc.o
+[100%] Linking CXX executable cmake-tutorial
+[100%] Built target cmake-tutorial
+```
 
 Or we can use the CMake directly via:
 
-    cmake --build . --target cmake-tutorial
-
+```
+cmake --build . --target cmake-tutorial
+```
 
 ## Using CMake with 3rd-party library
 
@@ -143,72 +165,80 @@ We will use a [googletest](https://github.com/google/googletest) library to crea
 
 Add the following definition to `CMakeLists.txt`:
 
-    # Third-party library
-    include(ExternalProject)
-    ExternalProject_Add(googletest
-        PREFIX "${CMAKE_BINARY_DIR}/lib"
-        GIT_REPOSITORY "https://github.com/google/googletest.git"
-        GIT_TAG "master"
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/lib/installed
-    )
-    # Prevent build on all targets build
-    set_target_properties(googletest PROPERTIES EXCLUDE_FROM_ALL TRUE)
+```cmake
+# Third-party library
+include(ExternalProject)
+ExternalProject_Add(googletest
+    PREFIX "${CMAKE_BINARY_DIR}/lib"
+    GIT_REPOSITORY "https://github.com/google/googletest.git"
+    GIT_TAG "master"
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/lib/installed
+)
+# Prevent build on all targets build
+set_target_properties(googletest PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
-    # Define ${CMAKE_INSTALL_...} variables
-    include(GNUInstallDirs)
+# Define ${CMAKE_INSTALL_...} variables
+include(GNUInstallDirs)
 
-    # Specify where third-party libraries are located
-    link_directories(${CMAKE_BINARY_DIR}/lib/installed/${CMAKE_INSTALL_LIBDIR})
-    include_directories(${CMAKE_BINARY_DIR}/lib/installed/${CMAKE_INSTALL_INCLUDEDIR})
+# Specify where third-party libraries are located
+link_directories(${CMAKE_BINARY_DIR}/lib/installed/${CMAKE_INSTALL_LIBDIR})
+include_directories(${CMAKE_BINARY_DIR}/lib/installed/${CMAKE_INSTALL_INCLUDEDIR})
 
-    # This is required for googletest
-    find_package(Threads REQUIRED)
+# This is required for googletest
+find_package(Threads REQUIRED)
 
-    # Test
-    add_executable(math_test test/math_test.cc)
-    target_link_libraries(math_test math gtest Threads::Threads)
-    # Make sure third-party is built before executable
-    add_dependencies(math_test googletest)
-    set_target_properties(math_test PROPERTIES EXCLUDE_FROM_ALL TRUE)
+# Test
+add_executable(math_test test/math_test.cc)
+target_link_libraries(math_test math gtest Threads::Threads)
+# Make sure third-party is built before executable
+add_dependencies(math_test googletest)
+set_target_properties(math_test PROPERTIES EXCLUDE_FROM_ALL TRUE)
+```
 
 Re-generate the build files using the following command:
 
-    cd build/
-    cmake ..
+```
+cd build/
+cmake ..
+```
 
 Build the unit test:
 
-    cmake --build . --target math_test
+```
+cmake --build . --target math_test
+```
 
 Run the test:
 
-    % ./math_test 
-    [==========] Running 6 tests from 3 test cases.
-    [----------] Global test environment set-up.
-    [----------] 2 tests from MathAddTest
-    [ RUN      ] MathAddTest.PositiveNum
-    [       OK ] MathAddTest.PositiveNum (0 ms)
-    [ RUN      ] MathAddTest.ZeroB
-    [       OK ] MathAddTest.ZeroB (0 ms)
-    [----------] 2 tests from MathAddTest (0 ms total)
+```
+% ./math_test 
+[==========] Running 6 tests from 3 test cases.
+[----------] Global test environment set-up.
+[----------] 2 tests from MathAddTest
+[ RUN      ] MathAddTest.PositiveNum
+[       OK ] MathAddTest.PositiveNum (0 ms)
+[ RUN      ] MathAddTest.ZeroB
+[       OK ] MathAddTest.ZeroB (0 ms)
+[----------] 2 tests from MathAddTest (0 ms total)
 
-    [----------] 2 tests from MathSubTest
-    [ RUN      ] MathSubTest.PositiveNum
-    [       OK ] MathSubTest.PositiveNum (0 ms)
-    [ RUN      ] MathSubTest.ZeroB
-    [       OK ] MathSubTest.ZeroB (0 ms)
-    [----------] 2 tests from MathSubTest (0 ms total)
+[----------] 2 tests from MathSubTest
+[ RUN      ] MathSubTest.PositiveNum
+[       OK ] MathSubTest.PositiveNum (0 ms)
+[ RUN      ] MathSubTest.ZeroB
+[       OK ] MathSubTest.ZeroB (0 ms)
+[----------] 2 tests from MathSubTest (0 ms total)
 
-    [----------] 2 tests from MathMulTest
-    [ RUN      ] MathMulTest.PositiveNum
-    [       OK ] MathMulTest.PositiveNum (0 ms)
-    [ RUN      ] MathMulTest.ZeroB
-    [       OK ] MathMulTest.ZeroB (0 ms)
-    [----------] 2 tests from MathMulTest (0 ms total)
+[----------] 2 tests from MathMulTest
+[ RUN      ] MathMulTest.PositiveNum
+[       OK ] MathMulTest.PositiveNum (0 ms)
+[ RUN      ] MathMulTest.ZeroB
+[       OK ] MathMulTest.ZeroB (0 ms)
+[----------] 2 tests from MathMulTest (0 ms total)
 
-    [----------] Global test environment tear-down
-    [==========] 6 tests from 3 test cases ran. (0 ms total)
-    [  PASSED  ] 6 tests.
+[----------] Global test environment tear-down
+[==========] 6 tests from 3 test cases ran. (0 ms total)
+[  PASSED  ] 6 tests.
+```
 
 Done.
 
