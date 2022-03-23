@@ -3,6 +3,8 @@ cmake_minimum_required (VERSION 3.10)
 # Define the project
 project(cmake-tutorial)
 
+# GoogleTest requires at least C++11
+set(CMAKE_CXX_STANDARD 11)
 
 # Add definition for math library
 add_library(math src/math.cc)
@@ -18,7 +20,7 @@ include(ExternalProject)
 ExternalProject_Add(googletest
     PREFIX "${CMAKE_BINARY_DIR}/lib"
     GIT_REPOSITORY "https://github.com/google/googletest.git"
-    GIT_TAG "master"
+    GIT_TAG "main"
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/lib/installed
 )
 
