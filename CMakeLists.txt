@@ -42,11 +42,17 @@ include_directories(${CMAKE_BINARY_DIR}/lib/installed/${CMAKE_INSTALL_INCLUDEDIR
 find_package(Threads REQUIRED)
 
 
-# Test
+# CMakeLists.txt
+
+# Locate GTest
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+
+
+# Add test executable
 add_executable(math_test test/math_test.cc)
-target_link_libraries(math_test math gtest Threads::Threads)
+
+# Link the testexecutable with the google Test andpthread library
+target_link_libraries(math_test ${GTEST_BOTH_LIBRARIES}
 
 
-# Make sure third-party is built before executable
-add_dependencies(math_test googletest)
-set_target_properties(math_test PROPERTIES EXCLUDE_FROM_ALL TRUE)
